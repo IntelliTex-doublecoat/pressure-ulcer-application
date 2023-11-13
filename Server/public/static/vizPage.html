@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>visualization page</title>
+	<link rel="icon" href="./images/tabIcon.ico" type="image/x-icon">
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://d3js.org/d3.v6.js"></script>
+	<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei">
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400&display=swap" rel="stylesheet">
+
+	<style>
+		html {
+			height: 100%;
+			font-size: calc(1728vw / 1728);
+		}
+
+		@media screen and (min-width: 1920px) {
+			html {
+				font-size: 30px;
+			}
+		}
+
+		@media screen and (max-width: 1000px) {
+			html {
+				font-size: 10px;
+			}
+		}
+
+		body {
+			height: 100%;
+			background-color: #f4f6f9;
+		}
+
+		h1 {
+			font-family: 'Noto Sans SC', sans-serif;
+			font-size: 1.4rem;
+			margin: 0;
+		}
+
+		h2 {
+			font-family: 'Gloock', serif;
+			font-size: 1rem;
+			margin: 0;
+		}
+
+		p {
+			font-family: 'Noto Sans SC', sans-serif;
+			font-size: 1rem;
+		}
+
+
+		.cardButton {
+			border: #fff solid 1px;
+			margin: 0px;
+			background-color: #ffffff;
+			border-radius: 4px 10px 10px 4px;
+			box-shadow: 0 1.5rem 2rem rgba(209, 214, 208, 0.2);
+			align-items: center;
+			align-content: end;
+			justify-content: center;
+			margin-bottom: 1rem;
+			transition: all .1s ease-in-out;
+			width: 3rem;
+			padding: 0px;
+		}
+
+		.cardButton:hover {
+			border: rgba(72, 170, 57, 0.4) solid 3px;
+			box-shadow: 0 1.6rem 2rem rgba(209, 214, 208, 0.5);
+			transition: all .1s ease-in-out;
+
+		}
+
+		.cardButton:active {
+			background-color: rgb(254, 254, 254);
+			box-shadow: none;
+			transform: translateY(2px);
+			transition: all .1s ease-in-out;
+		}
+
+		.cardInnerIcon {
+			padding: 0.4rem;
+			user-select: none;
+		}
+
+		.tooltip-inner {
+			max-width: 200px;
+			padding: 3px 8px;
+			color: #212529;
+			font-family: 'ZCOOL XiaoWei';
+
+			text-align: center;
+			text-decoration: none;
+			background-color: #fff;
+			border-radius: 4px;
+			box-shadow: 0 1.5rem 2rem rgba(209, 214, 208, 0.2);
+			transform: translate(4px, 0);
+		}
+
+		.tooltip-arrow::after {
+			position: absolute;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			background-color: #000;
+			transform: translate(4px, 0);
+			border: none;
+		}
+
+		.bs-tooltip-end .tooltip-arrow::before {
+			border-right-color: #212529;
+			transform: translate(4px, 0);
+		}
+
+		.cardVizDiv {
+			margin: 0px;
+			padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+			border: none;
+			background-color: #ffffff;
+			border-radius: 1rem;
+			box-shadow: 0 1.5rem 2rem rgba(209, 214, 208, 0.4);
+			user-select: none;
+		}
+
+		.dropdown-item {
+			font-family: 'ZCOOL XiaoWei';
+			font-size: 1rem;
+		}
+
+		.dropdown-item:focus {
+			background-color: #49aa39;
+		}
+
+		.toggleButton {
+			font-family: 'ZCOOL XiaoWei';
+			font-size: 1rem;
+			background-color: #fff;
+			border: 2px solid rgba(0, 0, 0, .15);
+			border-radius: 0.4rem;
+		}
+
+		.variableBtn {
+			height: 1rem;
+			width: 1rem;
+			border-radius: 1rem;
+			margin-left: 0.6rem;
+		}
+
+		.detailedSugDiv {
+			width: 96%;
+			margin: 0px;
+			padding: 1rem;
+			padding-left: 2rem;
+			border: 2px solid rgba(244, 246, 249, 1);
+			background-color: rgba(244, 246, 249, 0.2);
+			border-radius: 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 1.2rem;
+		}
+
+		.detailedSugBoxPressure {
+			width: 1rem;
+			height: 1rem;
+			border-radius: 1rem;
+			background-color: #9568f1;
+			margin-right: 1rem;
+		}
+
+		.detailedSugBoxTemp {
+			width: 1rem;
+			height: 1rem;
+			border-radius: 1rem;
+			background-color: #db6161;
+			margin-right: 1rem;
+		}
+
+		.detailedSugBoxHumidity {
+			width: 1rem;
+			height: 1rem;
+			border-radius: 1rem;
+			background-color: #5fb3dd;
+			margin-right: 1rem;
+		}
+
+		.hiddenDetailedSug {
+			display: none;
+			padding: 0rem 2rem 1rem 2rem;
+		}
+
+		.expandDetailTri {
+			display: inline-block;
+			margin-left: 1em;
+			vertical-align: 0.255em;
+			border-top: 0.3em solid;
+			border-right: 0.3em solid transparent;
+			border-bottom: 0;
+			border-left: 0.3em solid transparent;
+			transition: all 0.3s ease;
+		}
+
+		.hideDetailTri {
+			display: inline-block;
+			margin-left: 1em;
+			vertical-align: 0.255em;
+			border-bottom: 0.3em solid;
+			border-right: 0.3em solid transparent;
+			border-top: 0;
+			border-left: 0.3em solid transparent;
+			transition: all 0.3s ease;
+		}
+
+		.riskScaleBg {
+			width: 50%;
+			height: 1rem;
+			background-color: #ededed;
+			margin: 0rem 2rem 0rem 2rem;
+			border-radius: 1rem;
+		}
+
+		.riskScaleContent {
+			height: 1rem;
+			background-color: #db6161;
+			border-radius: 1rem;
+		}
+
+		.form-check-input:checked {
+			background-color: #49aa39;
+			border-color: #49aa39;
+		}
+
+		/* toggle switch css */
+		div.btn-container {
+			display: flex;
+			vertical-align: middle;
+			text-align: center;
+		}
+
+		div.btn-container i {
+			display: inline-block;
+			position: relative;
+			top: -9px;
+		}
+
+		label {
+			font-size: 1rem;
+			color: #424242;
+			font-weight: 500;
+		}
+
+		.btn-color-mode-switch {
+			display: inline-block;
+			margin: 0px;
+			position: relative;
+		}
+
+		.btn-color-mode-switch>label.btn-color-mode-switch-inner {
+			margin: 0px;
+			width: 8.4rem;
+			height: 2rem;
+			background: #E0E0E0;
+			border-radius: 1rem;
+			overflow: hidden;
+			position: relative;
+			transition: all 0.3s ease;
+			display: block;
+		}
+
+		.btn-color-mode-switch>label.btn-color-mode-switch-inner:before {
+			content: attr(data-on);
+			position: absolute;
+			font-size: 0.8rem;
+			font-family: 'ZCOOL XiaoWei';
+			top: 0.3rem;
+			right: 1.2rem;
+
+		}
+
+		.btn-color-mode-switch>label.btn-color-mode-switch-inner:after {
+			content: attr(data-off);
+			width: 4rem;
+			height: 1.6rem;
+			background: #fff;
+			border-radius: 2rem;
+			position: absolute;
+			left: 0.2rem;
+			top: 0.2rem;
+			text-align: center;
+			transition: all 0.3s ease;
+			font-size: 0.8rem;
+			box-shadow: 0px 0px 6px -2px #111;
+			font-family: 'ZCOOL XiaoWei';
+			padding: .1rem 0px;
+		}
+
+		.btn-color-mode-switch>.alert {
+			display: none;
+			background: #FF9800;
+			border: none;
+			color: #fff;
+		}
+
+		.btn-color-mode-switch input[type="checkbox"] {
+			cursor: pointer;
+			width: 4rem;
+			height: 1.6rem;
+			opacity: 0;
+			position: absolute;
+			top: 0;
+			z-index: 1;
+			margin: 0px;
+		}
+
+		.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner {
+			background: #b5d4b0;
+		}
+
+		.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner:after {
+			content: attr(data-on);
+			left: 4.2rem;
+			background: #fff;
+		}
+
+		.btn-color-mode-switch input[type="checkbox"]:checked+label.btn-color-mode-switch-inner:before {
+			content: attr(data-off);
+			right: auto;
+			left: 0.6rem;
+		}
+
+		.btn-color-mode-switch input[type="checkbox"]:checked~.alert {
+			display: block;
+		}
+	</style>
+</head>
+
+<body>
+	<div style="height: 100%;">
+		<div id="headerDiv" style="display: flex; justify-content: space-between; position: sticky; top: 0px">
+			<div style="display: flex; align-items: center; margin-left: .6rem;">
+				<div id="icon"></div>
+				<h1 style="font-family: 'Gloock', serif">INTELLITEX</h1>
+			</div>
+			<div style="display: flex; flex-direction: row; justify-content: flex-end; align-items: center;">
+
+				<div style="margin: 0rem 2rem; display: flex; align-items: center;  ">
+					<p style="margin-bottom: 0; margin-right: 2rem;">Hi, Intellitex users</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- main viz part -->
+		<div class="row" style="height: 90%; width: 100%;">
+			<!-- human body 3d view div three.js -->
+			<div class="col-3" id="modelCanvasDiv" style="height:100%">
+				<!-- These divs are used to hold the indicated svg circles -->
+				<div id="divHipRight" style="position: absolute;"></div>
+				<div id="divHipLeft" style="position: absolute;"></div>
+				<div id="divSacrum" style="position: absolute;"></div>
+				<div id="divShoulderBackRight" style="position: absolute;"></div>
+				<div id="divShoulderArmRight" style="position: absolute;"></div>
+				<div id="divShoulderBackLeft" style="position: absolute;"></div>
+				<div id="divShoulderArmLeft" style="position: absolute;"></div>
+				<div id="divElbowBackLeft" style="position: absolute;"></div>
+				<div id="divElbowSideLeft" style="position: absolute;"></div>
+				<div id="divElbowBackRight" style="position: absolute;"></div>
+				<div id="divElbowSideRight" style="position: absolute;"></div>
+			</div>
+
+			<!-- div d3.js -->
+			<div class="col-9" style="height: 100%; overflow-y: auto;">
+				<!-- Visualization of pressure, humidity and temperature -->
+				<div class="row" style="height: 60%; padding: 1rem 2rem 1rem 1rem;">
+
+					<div class="cardVizDiv" style="height: 100%;">
+						<!-- card header -->
+						<div class="row" style="height: 10%">
+							<div class="col-3">
+								<div style="display: flex; flex-direction:row;">
+									<img src="./images/fabricIcon.svg" alt="" style=" width: 2rem; margin-right: 1rem">
+									<h1>Sensor Readings</h1>
+								</div>
+							</div>
+						</div>
+
+						<div id="sensorStaticDiv" class="row" style="height: 90%;">
+							<!-- Close-up of the left body part -->
+							<div class="col-3"
+								style="height: 100%; padding: 2rem; display: flex; justify-content: center;">
+
+								<div style="display: flex; flex-direction: column; height: 100%; align-items: center;
+								justify-content: space-between;">
+
+									<!-- Body close-up pictures -->
+									<img id="closeUpSketch" src="./images/shoulderSketch.png" alt=""
+										style="height: 78%;">
+									<div>
+										<p id="bodyName" style="text-align: center;">right shoulder - back</p>
+									</div>
+
+								</div>
+							</div>
+
+							<div class="col-2"
+								style="height: 100%; display: flex; justify-content: center; padding: 1rem 0rem 1rem 0rem;">
+								<div style="height: 100%; display: block;">
+									<div
+										style="height: 50%; display: flex;flex-direction: column;align-items: center;justify-content: center;">
+										<img id="pressureIcon" src="./images/check.svg" alt=""
+											style=" width: 2rem; margin-bottom: 0.5rem;">
+										<p id="pressureState" style="text-align: center;">normal pressure</p>
+									</div>
+									<div
+										style="height: 50%; display: flex;flex-direction: column;align-items: center;justify-content: center;">
+										<img id="tempHumiIcon" src="./images/check.svg" alt=""
+											style=" width: 2rem; margin-bottom: 0.5rem;">
+										<p id="tempHumiState">normal temperature & humidity</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- right visualization -->
+							<div class="col-7" style="padding: 1rem 1rem 1rem 1rem;">
+								<!-- Detailed visualization mode (detail) -->
+								<div id="vizLineGraphSvg" style="height: 100%; display: block;">
+									<div id="vizPressureLineGraphSvg" style="height: 50%; display: block;"></div>
+									<div id="vizTempHumiLineGraphSvg" style="height: 50%; display: block;"></div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div class="row" style=" height: 60%; padding: 1rem 2rem 1rem 1rem; margin-bottom: 2rem;">
+
+					<!-- care suggestion -->
+					<div class="col" style="height: 100%; padding: 0px; ">
+						<div class="cardVizDiv" style="height: 100%;">
+							<!-- card header -->
+							<div class="row" style="height: 10%">
+								<div class="col-3">
+									<div style="display: flex; flex-direction:row;">
+										<img src="./images/suggestionIcon.svg" alt=""
+											style=" width: 2rem; margin-right: 1rem">
+										<h1>Care Suggestions</h1>
+									</div>
+								</div>
+							</div>
+
+							<div style="height: 84%; overflow: auto; padding: 1rem 0.6rem 1rem 0.6rem; ">
+								<div id="careSuggestionDiv"
+									style="display:flex;flex-direction: column;align-items: center;padding:0rem 1rem 1rem 1rem;">
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<script src="./js/d3DrawIcon.js"></script>
+	<script>
+		drawIcon(60, "icon", false, false);
+	</script>
+
+	<!-- bootstrap5 tooltip -->
+	<script>
+		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+		var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+			return new bootstrap.Tooltip(tooltipTriggerEl)
+		})
+
+		//click and hide tooltip
+		$('[data-toggle="tooltip"]').on('click', function () {
+			$(this).tooltip('hide')
+		});
+	</script>
+
+	<!-- detailed suggestion -->
+	<script>
+		function detailSugClick(obj) {
+			if ($(obj).find(".hiddenDetailedSug").css('display') == "none") // if cannot see
+			{
+				$(obj).find(".hiddenDetailedSug").delay(0).slideDown(500); // open folded content
+				$(obj).find(".expandDetailTri").attr("class", "hideDetailTri");
+			}
+			else {
+				$(obj).find(".hiddenDetailedSug").delay(0).slideUp(500); // close folded content
+				$(obj).find(".hideDetailTri").attr("class", "expandDetailTri");
+			}
+		}
+	</script>
+
+	<!-- visualization gantt/line chart -->
+	<script src="./js/d3GanttLineChart.js"></script>
+
+	<!-- Functions that pull data from the backend -->
+	<script>
+		function fetchData() {
+			let xhr = new XMLHttpRequest();
+			xhr.open("get", `http://127.0.0.1/reqFilteredLineData?patch=${currentSelectedBodyPartDataName}`);
+			xhr.send();
+			xhr.onload = function () {
+				let data = JSON.parse(xhr.responseText)
+				console.log(data)
+				if (data[3].length != 0)
+					updateWarningMessage(data[3])
+				if (data[0] != "") {
+					console.log(data);
+					switchPressureLineGraphDataTo(data[0])
+					switchTempHumiLineGraphDataTo(data[1])
+					console.log(data[2])
+					if (!data[2].pressure && !data[2].temp && !data[2].humidity) {
+						d3.select("#pressureState")
+							.html("normal pressure")
+						d3.select("#pressureIcon")
+							.attr("src", "./images/check.svg")
+					}
+					else if (data[2].pressure && !data[2].temp && !data[2].humidity) {
+						d3.select("#pressureState")
+							.html("high pressure")
+						d3.select("#pressureIcon")
+							.attr("src", "./images/pressureIcon.svg")
+					}
+					if (data[2].temp) {
+						d3.select("#tempHumiState")
+							.html("high temperature")
+						d3.select("#tempHumiIcon")
+							.attr("src", "./images/temperatureIcon.svg")
+
+						d3.select("#pressureState")
+							.html("crosstalk in pressure readings, please solve high temperature first")
+						d3.select("#pressureIcon")
+							.attr("src", "./images/problem.svg")
+					}
+					if (data[2].humidity) {
+						d3.select("#tempHumiState")
+							.html("high humidity")
+						d3.select("#tempHumiIcon")
+							.attr("src", "./images/humidityIcon.svg")
+
+						d3.select("#pressureState")
+							.html("crosstalk in pressure readings, please solve high humidity first")
+						d3.select("#pressureIcon")
+							.attr("src", "./images/problem.svg")
+					}
+					if (!data[2].humidity && !data[2].temp) {
+						d3.select("#tempHumiState")
+							.html("normal humidity & temperature")
+						d3.select("#tempHumiIcon")
+							.attr("src", "./images/check.svg")
+					}
+				}
+				else {
+					switchPressureLineGraphDataTo([])
+					switchTempHumiLineGraphDataTo([])
+				}
+			}
+		}
+	</script>
+
+	<!-- svg circles on the human body -->
+	<script>
+		let currentSelectedBodyPartDivName = null; // current selected body parts
+		let selectedBodyPartOnFirstChange = false; // Whether the currently selected object changes
+		const bodyParts = ["shoulderRBack", "shoulderRSide", "shoulderLBack", "shoulderLSide", "elbowLBack", "elbowLSide", "elbowRBack", "elbowRSide", "hipBack", "hipRSide", "hipLSide"];
+		let currentSelectedBodyPartDataName = "shoulderRBack";
+
+		const closeUpSketchPath = ["shoulderRSketch", "armTopSketch", "shoulderLSketch", "armTopSketch", "elbowBackSketch", "elbowSideSketch", "elbowBackSketch", "elbowSideSketch", "sacrumSketch", "hipSketchRight", "hipSketchLeft"];
+
+		// Sets the body part to be selected, the incoming parameter is the id name of the div corresponding to the svg circle.
+		function selectBodyParts(divName) {
+			if (divName != currentSelectedBodyPartDivName) {
+				selectedBodyPartOnFirstChange = true;
+			}
+
+			// update closeUpSketch
+			d3.select("#closeUpSketch")
+				.attr("src", `./images/${closeUpSketchPath[svgCircleDivIdName.indexOf(divName)]}.png`)
+
+			d3.select("#bodyName")
+				.text(bodyNameDescription[svgCircleDivIdName.indexOf(divName)])
+
+			currentSelectedBodyPartDataName = bodyParts[svgCircleDivIdName.indexOf(divName)];
+			fetchData();
+
+			currentSelectedBodyPartDivName = divName;
+		}
+	</script>
+
+	<!-- update warning message -->
+	<script>
+		let warningMessageLength = 0;
+		let tempDemon = [{
+			"type": "temp", "area": "Left Shoulder", "message": `
+		<p>High temperature detected on the left shoulder.</p>
+		<p>High temperatures in this area may be caused by the care recipient's body remaining in the same position for too long where it is difficult for the skin to dissipate heat. Consider changing the current lying body position.</p>
+		<p>The following points need to be followed in order to move the care recipient from a lying position to a side-lying position:</p>
+		<p>1. When transferring the care recipient from a lying position to a side-lying position, the care recipient's legs, arms, and head need to be gently shifted to one side until the care recipient is lying on his or her side. Once the transfer is complete, the care recipient's body needs to be stabilized to prevent him/her from tipping forward or backward, and sheets and pillows need to be adjusted to ensure the care recipient's comfort and stability. </p
+                <p>2. You need to keep your hands clean when turning the care recipient to avoid risks of infection to the care recipient's body. </p>
+                <p>3. Check sheets and mattresses for wrinkles to avoid excessive skin friction when turning. It is also important to minimize high shear forces when turning, i.e. not rubbing the skin against the bed surface. It is recommended to use tools such as nursing pads or wipes to turn the care recipient's body as a whole, rather than dragging the body directly. </p>
+                <p>4. When turning, care needs to be taken not to twist the care recipient's body excessively to avoid additional injury. The care recipient should be allowed to maintain the natural curves of the body as much as possible and be properly supported. </p
+                <p>5. Work in pairs, if possible, with one person supporting the care recipient while the other turns him or her over. Gently slide the care recipient's body without pulling. </p>
+                <p>After turning, you need to check the skin in the scapula area (or other areas of the skin where chronic high pressure has been detected, such as the back of the elbows, the sacral area, etc.) for damage. If redness, swelling, or broken skin is detected, the skin needs to be cleaned and dressed. Dressings need to be chosen on a case-by-case basis and you should consult your doctor or nurse before applying them. If you find that the skin damage is more serious, you need to consult a doctor in time and follow the doctor's instructions for treatment. </p>
+		`}];
+
+		function updateWarningMessage(message) {
+			if (message.length > warningMessageLength) {
+				let htmlString = "";
+
+				for (let i = message.length - 1; i >= 0; i--) {
+					let shortMsg = `${new Date().getMonth() + 1}/${new Date().getDate()} ${new Date().getHours()}:${new Date().getMinutes()}&nbsp&nbsp&nbsp&nbsp`;
+					shortMsg += message[i].area;
+
+					if (message[i].type == "pressure")
+						shortMsg += ": Prolonged Pressure Warning"
+					else if (message[i].type == "temp")
+						shortMsg += "：High Temperature Warning"
+					else
+						shortMsg += ": High Humidity Warning"
+
+					let colorDotClass;
+					if (message[i].type == "pressure")
+						colorDotClass = "detailedSugBoxPressure"
+					else if (message[i].type == "temp")
+						colorDotClass = "detailedSugBoxTemp"
+					else
+						colorDotClass = "detailedSugBoxHumidity"
+
+					htmlString += `<div type="button" onclick="detailSugClick(this)"
+										style="display: flex; width: 100%; justify-content: center; flex-direction: column;">
+										<div class="detailedSugDiv">
+											<div class="${colorDotClass}"></div>
+											<p style="margin: 0px;">${shortMsg}</p>
+											<div class="expandDetailTri"></div>
+										</div>
+										<div class="hiddenDetailedSug">
+											${message[i].message}
+										</div>
+									</div>`
+				}
+
+				d3.select("#careSuggestionDiv")
+					.html(htmlString)
+				warningMessageLength = message.length;
+			}
+		}
+
+	</script>
+
+	<!-- draw line graph -->
+	<script>
+		vizLineGraph("vizPressureLineGraphSvg", "vizTempHumiLineGraphSvg");
+		fetchData();
+		setInterval(fetchData, 4000); 
+	</script>
+
+
+	<!-- three.js imports -->
+	<script type="importmap">
+		{
+			"imports": {
+				"three": "./js/three/build/three.module.js",
+				"three/addons/": "./js/three/jsm/"
+			}
+		}
+	</script>
+
+	<!-- Setting the position of the circle svg (synchronized movement with body parts) -->
+	<script>
+		const svgCircleDivIdName = ["divShoulderBackRight", "divShoulderArmRight", "divShoulderBackLeft", "divShoulderArmLeft", "divElbowBackLeft", "divElbowSideLeft", "divElbowBackRight", "divElbowSideRight", "divSacrum", "divHipRight", "divHipLeft"];
+		const svgCircleDivIdNameBack = ["divShoulderBackRight", "divShoulderBackLeft", "divElbowBackLeft", "divElbowBackRight", "divSacrum", "divHipRight", "divHipLeft"];
+		const svgCircleDivIdNameLeft = ["divElbowSideLeft", "divShoulderArmLeft"];
+		const svgCircleDivIdNameRight = ["divShoulderArmRight", "divElbowSideRight"];
+
+		const bodyNameDescription = ["right shoulder - back", "right shoulder - side", "left shoulder - back", "left shoulder - side",
+			"left elbow - back", "left elbow - side", "right elbow - back", "right elbow - side",
+			"sacrum", "right hip", "left hip"];
+
+		const svgMapRule = [];
+		const circleBodySvgRadius = 50;
+		const circleBodyRadius = 15;
+
+		svgCircleDivIdName.forEach(element => {
+			const svg = d3.select(`#${element}`)
+				.append("svg")
+				.attr("width", circleBodySvgRadius)
+				.attr("height", circleBodySvgRadius);
+			svgMapRule.push(svg)
+		});
+		updateCirclePosition()
+
+		function updateCirclePosition() {
+			for (let i = 0; i < svgMapRule.length; i++) {
+
+				svgMapRule[i].append("circle")
+					.attr("id", `${svgCircleDivIdName[i]}CircleRing`)
+					.attr("cx", `${circleBodySvgRadius / 2}px`)
+					.attr("cy", `${circleBodySvgRadius / 2}px`)
+					.attr("r", circleBodyRadius)
+					.attr("fill", "none")
+					.attr("stroke", "#49aa39")
+					.attr("stroke-width", "0")
+					.attr("opacity", 0)
+
+				svgMapRule[i].append("circle")
+					.attr("id", `${svgCircleDivIdName[i]}Circle`)
+					.attr("cx", `${circleBodySvgRadius / 2}px`)
+					.attr("cy", `${circleBodySvgRadius / 2}px`)
+					.attr("r", circleBodyRadius)
+					.attr("fill", "#49aa39")
+					.attr("opacity", 0.2);
+			}
+		}
+
+	</script>
+
+	<!-- three.js - visualize human body -->
+	<script type="module">
+		import * as THREE from 'three';
+		import { OrbitControls } from 'three/addons/controls/NewRotateOnlyControl.js';
+		import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+		import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
+		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
+		import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+
+		const scene = new THREE.Scene();
+
+		// add light
+		const pointLight = new THREE.PointLight(0xffffff, 1.0);
+		pointLight.position.set(400, 200, 400);
+
+		let cubeBodyPartPosXArr = [-0.42, -0.45, -0.05, 0.5625, 0.3, 0.64, -0.5, -0.5, -0.14, -0.2, 0.4]
+		let cubeBodyPartPosYArr = [3.54, 3.35, 3.54, 3.35, 2.66, 2.65, 2.66, 2.65, 2.4, 2.3, 2.3]
+		let cubeBodyPartPosZArr = [-0.05, 0.5625, -0.42, -0.45, -0.5, -0.5, 0.3, 0.64, -0.14, 0.4, -0.2]
+
+		let cubeBodyPartObjArr = []
+		for (let i = 0; i < svgCircleDivIdName.length; i++) {
+			const geometry1 = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+			const material1 = new THREE.MeshLambertMaterial({ color: 0x00ff00, transparent: true, opacity: 0 });
+			const cube = new THREE.Mesh(geometry1, material1);
+			cube.position.set(cubeBodyPartPosXArr[i], cubeBodyPartPosYArr[i], cubeBodyPartPosZArr[i],);
+			cubeBodyPartObjArr.push(cube);
+			scene.add(cube);
+		}
+
+		const pointLight3 = new THREE.PointLight(0xffffff, 0.3);
+		pointLight3.position.set(10, 6, -10);
+		scene.add(pointLight3);
+
+		scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+
+		const width = parseFloat(document.getElementById("modelCanvasDiv").clientWidth);
+		const height = parseFloat(document.getElementById("modelCanvasDiv").clientHeight);
+		
+		const camera = new THREE.PerspectiveCamera(30, width / height, 1, 30000);
+		camera.position.set(7, 2, 7);
+
+
+		const renderer = new THREE.WebGLRenderer();
+		renderer.antialias = true;
+		renderer.setPixelRatio(window.devicePixelRatio)
+		renderer.setClearAlpha(0.0);
+		renderer.setSize(width, height);
+		document.getElementById("modelCanvasDiv").appendChild(renderer.domElement);
+
+		const composer = new EffectComposer(renderer);
+		const renderPass = new RenderPass(scene, camera);
+		composer.addPass(renderPass);
+
+		const v2 = new THREE.Vector2(width, height);
+		const outlinePass = new OutlinePass(v2, scene, camera);
+		composer.addPass(outlinePass);
+		outlinePass.renderToScreen = true
+		outlinePass.edgeStrength = 10 
+		outlinePass.edgeThickness = 2 
+		outlinePass.visibleEdgeColor.set('#000')
+
+		let fxaaPass = new ShaderPass(FXAAShader)
+		const pixelRatio = renderer.getPixelRatio()
+		fxaaPass.material.uniforms['resolution'].value.x = 1 / (width * pixelRatio)
+		fxaaPass.material.uniforms['resolution'].value.y = 1 / (height * pixelRatio)
+		composer.addPass(fxaaPass)
+
+		const threeTone = new THREE.TextureLoader().load('./images/gradientMaps/threeTone.jpg')
+		threeTone.minFilter = THREE.NearestFilter
+		threeTone.magFilter = THREE.NearestFilter
+
+		const loader = new GLTFLoader();
+		let wrapper = new THREE.Object3D();
+		let bodyMeshArray = []
+		loader.load('./models/man.glb', function (gltf) {
+			gltf.scene.scale.set(2, 2, 2);
+			wrapper.position.set(0, 0, 0);
+			gltf.scene.position.set(0.534, 0, 0.2);
+			wrapper.add(gltf.scene);
+			wrapper.rotation.y = 1 / 4 * Math.PI;
+
+			gltf.scene.traverse(function (obj) {
+				if (obj.isMesh) {
+					bodyMeshArray.push(obj)
+					obj.material = new THREE.MeshToonMaterial({
+						color: 0xffffff,
+						gradientMap: threeTone,
+					});
+					outlinePass.selectedObjects.push(obj);
+				}
+			});
+
+			scene.add(wrapper);
+			updateSvgPosition();
+			updateSvgOpacity();
+
+		})
+
+		function updateSvgPosition() {
+			for (let i = 0; i < cubeBodyPartObjArr.length; i++) {
+				const vector = new THREE.Vector3();
+				const canvas = renderer.domElement; 
+				cubeBodyPartObjArr[i].updateMatrixWorld(); 
+				vector.setFromMatrixPosition(cubeBodyPartObjArr[i].matrixWorld);
+
+				vector.project(camera); 
+
+				const x = Math.round((0.5 + vector.x / 2) * (canvas.width / window.devicePixelRatio));
+				const y = Math.round((0.5 - vector.y / 2) * (canvas.height / window.devicePixelRatio));
+		
+				d3.select(`#${svgCircleDivIdName[i]}`)
+					.style("top", `${document.getElementById("headerDiv").clientHeight + y - document.getElementById(`${svgCircleDivIdName[i]}`).clientHeight / 2}px`);
+				d3.select(`#${svgCircleDivIdName[i]}`)
+					.style("left", `${x - document.getElementById(`${svgCircleDivIdName[i]}`).clientWidth / 2}px`)
+			}
+		}
+
+		function cancelSelectedHighlight() {
+			currentSelectedBodyPartDivName = null
+			
+			svgCircleDivIdName.forEach(element => {
+				d3.select(`#${element}Circle`)
+					.transition()
+					.attr("opacity", .3) 
+					.duration(100) 
+			})
+		}
+
+		function updateSvgOpacity() {
+
+			function contractCircle() {
+				d3.select(`#${currentSelectedBodyPartDivName}CircleRing`)
+					.transition()
+					.duration(1000)
+					.attr('r', circleBodyRadius)
+					.attr("opacity", 1)
+					.attr("stroke-width", "0")
+					.on('end', expandCircle);
+			}
+
+			function expandCircle() {
+				d3.select(`#${currentSelectedBodyPartDivName}CircleRing`)
+					.transition()
+					.duration(1000)
+					.attr('r', circleBodyRadius * 1.3)
+					.attr("opacity", 0.2)
+					.attr("stroke-width", "5")
+					.on('end', contractCircle);
+			}
+
+
+			if (!currentSelectedBodyPartDivName)
+				return;
+
+				if (selectedBodyPartOnFirstChange) {
+				d3.select(`#${currentSelectedBodyPartDivName}CircleRing`)
+					.transition()
+					.duration(500)
+					.attr("opacity", 1);
+				expandCircle();
+				selectedBodyPartOnFirstChange = false;
+				svgCircleDivIdName.forEach(element => {
+					if (element != currentSelectedBodyPartDivName) {
+
+						d3.select(`#${element}CircleRing`)
+							.transition()
+							.duration(500)
+							.attr("opacity", 0);
+						d3.select(`#${element}Circle`)
+							.transition()
+							.attr("opacity", .3) 
+							.duration(100) 
+					}
+				})
+			}
+
+			const raycaster = new THREE.Raycaster();
+			raycaster.ray.origin = camera.position; 
+
+			const selectedObj = cubeBodyPartObjArr[svgCircleDivIdName.indexOf(currentSelectedBodyPartDivName)];
+			raycaster.ray.direction = new THREE.Vector3(selectedObj.position.x - camera.position.x,
+				selectedObj.position.y - camera.position.y, selectedObj.position.z - camera.position.z).normalize(); 
+			raycaster.far = selectedObj.position.distanceTo(camera.position)
+
+			if (raycaster.intersectObjects(bodyMeshArray).length != 0) { 
+				d3.select(`#${currentSelectedBodyPartDivName}Circle`)
+					.transition()
+					.attr("opacity", .6) 
+					.duration(100) 
+
+			} else {
+				d3.select(`#${currentSelectedBodyPartDivName}Circle`)
+					.transition()
+					.attr("opacity", 1) 
+					.duration(100) 
+			}
+		}
+
+		const controls = new OrbitControls(camera, renderer.domElement);
+
+		controls.addEventListener('change', function () {
+			renderer.render(scene, camera); 
+			updateSvgPosition();
+			updateSvgOpacity();
+		});
+
+		controls.target = new THREE.Vector3(0, 2, 0);
+		controls.update();
+
+		function render() {
+			updateSvgPosition();
+			updateSvgOpacity();
+
+			composer.render();
+			requestAnimationFrame(render);
+		}
+		render();
+
+		$(document).ready(function () {
+			$("#angleButBack").bind("click", function () {
+				controls.rotateAngle("back");
+			});
+		});
+
+		$(document).ready(function () {
+			$("#angleButFront").bind("click", function () {
+				controls.rotateAngle("front");
+			});
+		});
+
+		for (let i = 0; i < svgCircleDivIdName.length; i++) {
+
+			if (svgCircleDivIdNameBack.indexOf(svgCircleDivIdName[i]) != -1)
+			{
+				d3.select(`#${svgCircleDivIdName[i]}Circle`)
+					.on("click", () => {
+						controls.rotateAngle("back");
+						selectBodyParts(svgCircleDivIdName[i])
+					})
+			}
+			else if (svgCircleDivIdNameLeft.indexOf(svgCircleDivIdName[i]) != -1) 
+			{
+				d3.select(`#${svgCircleDivIdName[i]}Circle`)
+					.on("click", () => {
+						controls.rotateAngle("left");
+						selectBodyParts(svgCircleDivIdName[i])
+					})
+			}
+			else if (svgCircleDivIdNameRight.indexOf(svgCircleDivIdName[i]) != -1)
+			{
+				d3.select(`#${svgCircleDivIdName[i]}Circle`)
+					.on("click", () => {
+						controls.rotateAngle("right");
+						selectBodyParts(svgCircleDivIdName[i])
+					})
+			}
+
+		}
+
+		d3.select(`#cardShoulderIcon`)
+			.on("click", () => {
+				controls.rotateAngle("back");
+				selectBodyParts("divShoulderLeft")
+			})
+
+		d3.select(`#cardElbowIcon`)
+			.on("click", () => {
+				controls.rotateAngle("back");
+				selectBodyParts("divElbowLeft")
+			})
+
+		d3.select(`#cardHipIcon`)
+			.on("click", () => {
+				controls.rotateAngle("back");
+				selectBodyParts("divHip")
+			})
+
+		d3.select(`#cardKneeIcon`)
+			.on("click", () => {
+				controls.rotateAngle("back");
+				selectBodyParts("divKneeLeft")
+			})
+
+		d3.select(`#cardHeelIcon`)
+			.on("click", () => {
+				controls.rotateAngle("back");
+				selectBodyParts("divHeel")
+			})
+	</script>
+
+
+
+</body>
+
+</html>
